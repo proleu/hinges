@@ -36,8 +36,8 @@ sf = sf_obj.get_score_function('sfxn_design')
 sf_clean = sf_obj.get_score_function('sfxn')
 
 
-file_x = glob.glob("pair*_X_*pdb")[0]
-file_y = glob.glob("pair*_Y_*pdb")[0]
+file_x = glob.glob("0*pdb")[0]
+file_y = glob.glob("1*pdb")[0]
 
 
 pose1 = pyrosetta.io.pose_from_pdb(file_x)
@@ -56,9 +56,18 @@ def des_y_initial(despose,refpose,weight=0,strict_layers = 0):
     allres = pyrosetta.rosetta.core.select.get_residues_from_subset(true_sel.apply(despose))
     diff = pyrosetta.rosetta.utility.vector1_unsigned_long()
     for i in allres:
-        if despose.sequence(i,i) != refpose.sequence(i,i):
+        if despose.sequence(i,i) == "C": # maintain disulfides in despose
+            continue
+        elif refpose.sequence(i,i) == "C": # safely replace despose residue with CYS (not CYD)
+            mut = pyrosetta.rosetta.protocols.simple_moves.MutateResidue()
+            mut.set_target(i)
+            mut.set_res_name(pyrosetta.rosetta.core.chemical.AA(2)) # 2 is CYS
+            mut.apply(despose)
+        elif despose.sequence(i,i) != refpose.sequence(i,i):
             diff.append(i)
             despose.replace_residue(i,refpose.residue(i),1)
+        else:
+            pass
     num_des_res.append(len(diff))
     des_res.append(diff)
     #what to design
@@ -264,9 +273,18 @@ def msd_fnr(despose,refpose,weight=1,strict_layers = 0,neighbors = 0):
     allres = pyrosetta.rosetta.core.select.get_residues_from_subset(true_sel.apply(despose))
     diff = pyrosetta.rosetta.utility.vector1_unsigned_long()
     for i in allres:
-        if despose.sequence(i,i) != refpose.sequence(i,i):
+        if despose.sequence(i,i) == "C": # maintain disulfides in despose
+            continue
+        elif refpose.sequence(i,i) == "C": # safely replace despose residue with CYS (not CYD)
+            mut = pyrosetta.rosetta.protocols.simple_moves.MutateResidue()
+            mut.set_target(i)
+            mut.set_res_name(pyrosetta.rosetta.core.chemical.AA(2)) # 2 is CYS
+            mut.apply(despose)
+        elif despose.sequence(i,i) != refpose.sequence(i,i):
             diff.append(i)
             despose.replace_residue(i,refpose.residue(i),1)
+        else:
+            pass
     num_des_res.append(len(diff))
     des_res.append(diff)
     #print(f"designing {len(diff)} residues")
