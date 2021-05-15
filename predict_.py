@@ -86,14 +86,14 @@ def main(argv):
       print(f"saving: {pre}_{nam}_{n}.pdb")
 
       #save image
-      plt.figure(figsize=(5*6,5))
-      for k in range(6):
-        plt.subplot(1,6,k+1)
-        if k < 5: plt.title(f"model {k}")
-        else: plt.title(f"avg_model")
-        plt.imshow(feats[k]["cb"].argmax(-1))
-      plt.savefig(f"{pre}_{nam}_{n}.png", bbox_inches='tight')
-      plt.close()
+      # plt.figure(figsize=(5*6,5))
+      # for k in range(6):
+      #   plt.subplot(1,6,k+1)
+      #   if k < 5: plt.title(f"model {k}")
+      #   else: plt.title(f"avg_model")
+      #   plt.imshow(feats[k]["cb"].argmax(-1))
+      # plt.savefig(f"{pre}_{nam}_{n}.png", bbox_inches='tight')
+      # plt.close()
 
 class mk_design_model:
   '''
