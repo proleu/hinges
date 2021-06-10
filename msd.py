@@ -1,7 +1,7 @@
 #!/mnt/home/pleung/.conda/envs/phil/bin/python
-__author__ = "Brian Coventry, Tim Huddy, Philip Leung"
+__author__ = "Florian Praetorius, Philip Leung"
 __copyright__ = None
-__credits__ = ["Philip Leung", "Rosettacommons"]
+__credits__ = ["Philip Leung", "Florian Praetorius", "Rosettacommons"]
 __license__ = "MIT"
 __version__ = "0.8.0"
 __maintainer__ = "Philip Leung"
@@ -27,7 +27,6 @@ from typing import *
 
 def msd(packed_pose_in: PackedPose, **kwargs) -> PackedPose:
     """
-    Uses sc_neighbors as of 20210505
     Assumes middle split, allowing backwards selection
     """
 
@@ -658,6 +657,9 @@ def msd(packed_pose_in: PackedPose, **kwargs) -> PackedPose:
     for common_key in common_keys:
         combined_scores[common_key] = scores[common_key]
     combined_XY = combined_pose_maker(to_return)
+    sw = pyrosetta.rosetta.protocols.simple_moves.SwitchChainOrderMover()
+    sw.chain_order("12")
+    sw.apply(combined_XY)
     # clear scores and update
     pyrosetta.rosetta.core.pose.clearPoseExtraScores(combined_XY)
     for key, value in combined_scores.items():
@@ -682,6 +684,7 @@ def msd(packed_pose_in: PackedPose, **kwargs) -> PackedPose:
     """
 
     pose = combined_XY.clone()
+    scores = deepcopy(pose.scores)
     # clean pose
     for key, _ in pose.scores.items():
         pyrosetta.rosetta.core.pose.clearPoseExtraScore(pose, key)
